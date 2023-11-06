@@ -10,7 +10,6 @@ import java.awt.*;
 import java.awt.event.*;
 
 public class MultiChatC_login extends Frame implements ActionListener, KeyListener {
-	
    TextArea display;
    TextField wtext, ltext;
    Label mlbl, wlbl, loglbl;

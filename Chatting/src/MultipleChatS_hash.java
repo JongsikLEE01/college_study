@@ -1,5 +1,7 @@
 // Step 2
 // 메시지를 이용하지 않고 다수의 클라이언트간의 체팅프로그램
+// 아이디와 스레드가 문제가 없을 경우 데이터를 해쉬테이블에 저장
+// 클라이언트와 대화말 아이디, 접속한 사람의 아이디를 출력, -> 로그아웃 기능추가(대화말에 (\logout 아이디)를 입력시 서버에서 로그아웃을 함)+접속된사람 아이디 다시 출력 
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.Label;
@@ -152,7 +154,7 @@ class MultipleThreadHash extends Thread {
      			display.append("\n");
      			break;
         	 }
-        	 //대화말 메시지
+        	 //대화말 메시지, 로그아웃
         	 case 0001 : {
      			clientdata = clientDataInfo[1];
      			display.append(id+"의 메세지: "+clientdata + "\r\n");
@@ -166,6 +168,38 @@ class MultipleThreadHash extends Thread {
  			         }
  	            break;
      				}
+        	 case 0002: {
+        		    clientdata = clientDataInfo[1];
+        		    if (clientdata.startsWith("\\logout ")) {
+        		        String logoutId = clientdata.substring(8);
+        		        if (logoutId.equals(id)) {
+        		            cs.hs.remove(id); // 해쉬테이블에서 아이디를 제거
+        		            // 로그아웃을 알림
+        		            Collection<MultipleThreadHash> tableValues = cs.hs.values();
+        		            for (MultipleThreadHash value : tableValues) {
+        		                MultipleThreadHash SThread = value;
+        		                if (this.num != SThread.num) {
+        		                    SThread.output.write(id + " 님이 로그아웃 하였습니다.\r\n");
+        		                    SThread.output.flush();
+        		                }
+        		            }
+        		            try {
+        		                sock.close(); // 소켓 연결 해제
+        		            } catch (IOException ea) {
+        		                ea.printStackTrace();
+        		            }
+        		            //현재 로그인중인 클라이언트를 출력
+        		            Enumeration<String> tableKeys = cs.hs.keys();
+        		            while (tableKeys.hasMoreElements()) {
+        		                display.append(tableKeys.nextElement() + "  ");
+        		            }
+        		            display.append("\n");
+        		        }
+        		    }
+        		    break;
+        		}
+        	 
+        	 
 		         }
 		      }
       }catch(Exception e) {

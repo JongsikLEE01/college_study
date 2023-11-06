@@ -1,5 +1,6 @@
 // Step 2
 // 서버-클라이언트 구조에서 다수의 클라이언트가 대화하는 프로그램
+// 클라이언트와 대화말 아이디, 접속한 사람의 아이디를 출력, -> 로그아웃 기능추가(대화말에 (\logout 아이디)를 입력시 서버에서 로그아웃을 함)+접속된사람 아이디 다시 출력 
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.Label;
@@ -17,7 +18,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-
 
 public class MultipleChatC_hash extends Frame implements ActionListener {
 	
@@ -112,6 +112,7 @@ public class MultipleChatC_hash extends Frame implements ActionListener {
 	      try{
 		         display.append("\r\n나: "+clientdata);
 		         output.write("0001|"+clientdata+"\r\n");
+		         output.write("0002|"+clientdata+"\r\n");
 		         output.flush();
 		         text.setText("");
 		      } catch(IOException e){
@@ -124,7 +125,7 @@ public class MultipleChatC_hash extends Frame implements ActionListener {
 	    		  
 	    	  }
 	    	  try{
-	 	         output.write("1021|"+logindata+"\r\n");
+	 	         output.write("1021|"+logindata+"\r\n");  
 	 	         output.flush();
 	 	      } catch(IOException e){
 	 	         e.printStackTrace();
