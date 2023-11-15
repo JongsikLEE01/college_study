@@ -1,8 +1,8 @@
 <%@page language="java" contentType="text/html;charset=utf-8"%>
 <%@page import="java.util.ArrayList" %>
 <%@page import="java.net.URLDecoder" %>
-<%@page import="dto.Product"%>
-<%@page import="dao.ProductRepository" %>
+<%@page import="dto.Book"%>
+<%@page import="dao.BookRepository" %>
 <%
 	request.setCharacterEncoding("UTF-8");
 
@@ -74,18 +74,18 @@
 				</tr>
 				<%
 					int sum=0;
-					ArrayList<Product> cartList = (ArrayList<Product>) session.getAttribute("cartlist");
+					ArrayList<Book> cartList = (ArrayList<Book>) session.getAttribute("cartlist");
 					if(cartList == null)
-						cartList = new ArrayList<Product>();
+						cartList = new ArrayList<Book>();
 					for(int i = 0; i < cartList.size(); i++){
-						Product product = cartList.get(i);
-						int total = product.getUnitPrice() * product.getQuantity();
+						Book book = cartList.get(i);
+						int total = book.getUnitPrice() * book.getQuantity();
 						sum = sum + total;
 				%>
 				<tr>
-					<td class="text-center"><em><%=product.getPname() %></em></td>
-					<td class="text-center"><%=product.getQuantity() %></td>
-					<td class="text-center"><%=product.getUnitPrice() %>원</td>
+					<td class="text-center"><em><%=book.getName() %></em></td>
+					<td class="text-center"><%=book.getQuantity() %></td>
+					<td class="text-center"><%=book.getUnitPrice() %>원</td>
 					<td class="text-center"><%=total %>원</td>
 				</tr>
 				<%
