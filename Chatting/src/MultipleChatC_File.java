@@ -1,7 +1,12 @@
-//step 4 귓속말 기능 추가
+// Step 2
+// 서버-클라이언트 구조에서 다수의 클라이언트가 대화하는 프로그램
 import java.awt.BorderLayout;
+import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.Label;
+import java.awt.Menu;
+import java.awt.MenuBar;
+import java.awt.MenuItem;
 import java.awt.Panel;
 import java.awt.TextArea;
 import java.awt.TextField;
@@ -11,17 +16,19 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
-public class MultipleChatC_whisper extends Frame implements ActionListener {
-	
+public class MultipleChatC_File extends Frame implements ActionListener {
    TextArea display;
    TextField text, loginText;
    Label mlbl,lword, loginLabel;
+   FileDialog filedlg;
    BufferedWriter output;
    BufferedReader input;
    Socket client;
@@ -30,7 +37,7 @@ public class MultipleChatC_whisper extends Frame implements ActionListener {
    String logindata = null;
    String id;
    boolean loginCheck = false;
-   public MultipleChatC_whisper() {
+   public MultipleChatC_File() {
       super("클라이언트");
       display=new TextArea("", 0, 0, TextArea.SCROLLBARS_VERTICAL_ONLY);
       display.setEditable(false);
@@ -59,8 +66,16 @@ public class MultipleChatC_whisper extends Frame implements ActionListener {
       ptotal.add(plabel,BorderLayout.SOUTH);
       
       add(ptotal, BorderLayout.SOUTH);
-
       
+      MenuBar mbar = new MenuBar();
+      filedlg = new FileDialog(this);
+      Menu fileMenu = new Menu("파일");
+      MenuItem sendItem = new MenuItem("파일전송");
+      sendItem.addActionListener(this);
+      fileMenu.add(sendItem);
+      
+      mbar.add(fileMenu);
+      setMenuBar(mbar);
       
       addWindowListener(new WinListener());
       setSize(400, 300);
@@ -101,62 +116,54 @@ public class MultipleChatC_whisper extends Frame implements ActionListener {
    public void actionPerformed(ActionEvent ae){
       clientdata = text.getText();
       logindata = loginText.getText();
-      
       if(logindata == null || logindata.isEmpty()) {
     	  mlbl.setText("로그인을 해야합니다!");
     	  text.setText("");
     	  
       }else if(ae.getSource() == text) {
 	      try{
-	    	  if(clientdata.startsWith("\\logout")) {
-	    		  // logout 메시지입니다....
-	    		  // 서버에 "1001|아이디"
-	    		  display.append("로그아웃 메시지입니다.\n");
-	    		  String logoutid = clientdata.substring(8);
-	    		  display.append("로그아웃 아이디는 \n"+logoutid);
-	    		  output.write("1001|"+logoutid+"\r\n");
-	    		  output.flush();
-			      text.setText("");
-	    	  }else if(clientdata.startsWith("\\w")){
-	    		  //1011|아이디|귓속말 메세지
-	    		  int start = clientdata.indexOf("\s")+1; // 문자 뒤 공백있을경우 문자가 가지 않는 에러 수정
-	    		  int end = clientdata.indexOf("\s",start);
-	    		  if(end != -1) {
-	    		  String uesrID = clientdata.substring(start, end);
-	    		  String Message = clientdata.substring(end+1);
-	    		  display.append("\r\n"+ uesrID + "님에게 보낸 귓속말: "+Message);
-			      output.write("1011|"+ uesrID +"|"+ Message + "\r\n");
-			      output.flush();
-			      text.setText("");
-	    		  }
-	    	  } else { 
-	    		 // 0001|대화말 메시지...
 		         display.append("\r\n나: "+clientdata);
-		         output.write("0001|"+clientdata+"\r\n");
+		         output.write("1001|"+clientdata+"\r\n");
 		         output.flush();
 		         text.setText("");
-	    	  }
-		   }catch(IOException e){
-		      e.printStackTrace();
-		   }
+		      } catch(IOException e){
+		         e.printStackTrace();
+		      }
 	      }
-	  else if(ae.getSource() == loginText) {
-	    id = logindata;
-	    if(loginCheck) {
-	    		  
-	  }
-	    try{
-	          output.write("1021|"+logindata+"\r\n");
-	          output.flush();
-	    } catch(IOException e){
-	         e.printStackTrace();
-	    }
-	 }
+	      else if(ae.getSource() == loginText) {
+	    	  id = logindata;
+	    	  try{
+	 	         output.write("1021|"+logindata+"\r\n");
+	 	         output.flush();
+	 	      } catch(IOException e){
+	 	         e.printStackTrace();
+	 	      }
+	      }
+	      else {
+			   filedlg.setVisible(true);
+			   File file = filedlg.getFiles()[0];
+			   FileInputStream fin = null;
+			   try {
+				   fin = new FileInputStream(file);
+				   output.write("1022|"+file.getName()+"|"+String.valueOf(file.length())+"\r\n");
+				   output.flush();
+				   client.getOutputStream().write(fin.readNBytes((int)file.length()));
+	   			   display.append("\n파일 " + file.getName() + "(을)를 보냈습니다.");
+			   } catch(Exception e) {
+	   			  display.append("\n파일 " + file.getName() + "(을)를 보내는데 실패했습니다.");
+			   }
+			   
+			   try {
+				   if(fin != null) fin.close();
+			   } catch(Exception e) {
+				   e.printStackTrace();
+			   }
+		   }
       
    }
 		
    public static void main(String args[]) {
-      MultipleChatC_whisper c = new MultipleChatC_whisper();
+      MultipleChatC_File c = new MultipleChatC_File();
       c.runClient();
    }
 		
