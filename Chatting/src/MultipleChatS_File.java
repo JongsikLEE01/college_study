@@ -1,5 +1,6 @@
 // Step 2
 // 메시지를 이용하지 않고 다수의 클라이언트간의 체팅프로그램
+// B반 202005040 이종식
 import java.awt.BorderLayout;
 import java.awt.Frame;
 import java.awt.Label;
@@ -94,7 +95,7 @@ class MultipleThreadFile extends Thread {
    MultipleChatS_File cs;
    int num;
    String id;
-   
+	
    public MultipleThreadFile(MultipleChatS_File c, Socket s, TextArea ta, Label l, String data, int n) {
       sock = s;
       display = ta;
@@ -151,27 +152,36 @@ class MultipleThreadFile extends Thread {
         	 }
         	 
         	 case 1022: {
-        		 //파일 다운로드
-        		 String path = "/User/1-314/Docments/Java_File/";
-        		 String fileName = clientDataInfo[1];
-        		 int fileSize = Integer.parseInt(clientDataInfo[2]);
-        		 byte[] buffer = is.readNBytes(fileSize);
-        		 FileOutputStream fout = null;
-        		 try {
-         			fout = new FileOutputStream(fileName);
-         			fout.write(buffer);
-         			display.append("\n"+id+"님으로부터 파일 " + fileName + "(을)를 받았습니다.\n");
-         		} catch(Exception e) {
-         			display.append("\n"+id+"님으로부터 파일 " + fileName + "받기를 실패했습니다.\n");
-         		}
-         		try {
-         			if(fout != null) fout.close();
-         		} catch(Exception e) {
-         			e.printStackTrace();
-         		}
-         		break;
+        	     String fileName = clientDataInfo[1];
+        	     int fileSize = Integer.parseInt(clientDataInfo[2]);
+        	     byte[] buffer = new byte[fileSize];  //파일을 read메소드를 이용해 저장하기 위해서 배열로 선언
+        	     FileOutputStream fout = null;
+        	     
+        	     // System.getProperty 메소드를 이용해 파일 다운로드 경로 배경화면으로 지정
+        	     // 설명 블로그 : https://velog.io/@jyyoun1022/JAVA-System.getProperty-%EC%82%AC%EC%9A%A9%EB%B2%95
+        	     String Path = System.getProperty("user.home") + "/Desktop/";
+        	     String filePath = Path + fileName;
+        	     
+        	     try {
+        	    	 //배경화면에 파일을 생성, 클라이언트로부터 전송된 파일 내용을 읽어서 저장
+        	         fout = new FileOutputStream(filePath);
+        	         is.read(buffer); // 파일 내용을 버퍼로 읽음
+        	         fout.write(buffer);
+        	         // 파일 다운로드 성공시 메세지와 파일이 저장된 경로를 출력
+        	         display.append("\n" + id + "님으로부터 파일 " + fileName + "(을)를 받았습니다. \n저장 경로: " + filePath + "\n");
+        	     } catch (Exception e) {
+        	         display.append("\n" + id + "님으로부터 파일 " + fileName + "받기를 실패했습니다.\n");
+        	         e.printStackTrace();
+        	     } finally {
+        	         try {
+        	             if (fout != null) fout.close();
+        	         } catch (Exception e) {
+        	             e.printStackTrace();
+        	         }
+        	     }
+        	     break;
         	 }
-        	 
+
         	 case 1001 : {
      			clientdata = clientDataInfo[1];
      			display.append(id+"의 메세지: "+clientdata + "\r\n");
@@ -196,5 +206,6 @@ class MultipleThreadFile extends Thread {
       }catch(IOException ea) {
     	  ea.printStackTrace();
       }
-   } 
+   }
 }
+        	 
