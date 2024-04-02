@@ -23,6 +23,3 @@
 
 ## JSPBook
 - jsp 학습을 위해 사용한 예제 풀이
-
-# master
-## c
