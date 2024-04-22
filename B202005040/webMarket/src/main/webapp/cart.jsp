@@ -19,7 +19,7 @@
 		<div class="row">
 			<table width="100%">
 				<tr>
-					<td align="left"><a href="./deleteCart.jspx?cartId=<%=cartId%>" class="btn btn-danger">삭제하기</a></td>
+					<td align="left"><a href="./deleteCart.jsp?cartId=<%=cartId%>" class="btn btn-danger">삭제하기</a></td>
 					<td align="right"><a href="./shippingInfo.jsp?cartID=<%=cartId %>" class="btn btn-success">주문하기</a></td>
 				</tr>
 			</table>
